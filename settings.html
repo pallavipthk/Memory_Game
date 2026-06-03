@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🧠 Rainbow Memory Game</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&family=Great+Vibes&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Parisienne&display=swap');
+
+/* Body styles */
+body {
+  font-family: 'Parisienne', cursive;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: linear-gradient(120deg, #f5f7fa, #c3cfe2, #e0eafc);
+  background-size: 400% 400%;
+  animation: rainbowBG 30s ease infinite alternate;
+  color: #333;
+  overflow-x: hidden;
+  cursor: default;
+  transition: background 0.5s, color 0.5s;
+}
+
+body.dark {
+  background: linear-gradient(120deg, #1e1e2f, #2c3e50, #34495e);
+  background-size: 200% 200%;
+  animation: rainbowBG 30s ease infinite alternate;
+  color: #ddd;
+}
+
+@keyframes rainbowBG {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+/* Container */
+.container {
+  max-width: 720px;
+  width: 90%;
+  margin: 40px auto;
+  padding: 35px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+  border: 3px solid;
+  border-image: linear-gradient(45deg, #a1c4fd, #c2e9fb) 1;
+  transition: background 0.5s, color 0.5s, border 0.5s;
+}
+
+body.dark .container {
+  background: rgba(30,30,30,0.85);
+  color: #eee;
+  border-image: linear-gradient(135deg, #555, #aaa, #555) 1;
+}
+
+/* Headings */
+h1, h2, h3 {
+  margin: 12px 0;
+  font-family: 'Great Vibes', cursive;
+  font-weight: 400;
+  font-size: 2.5rem;
+  background: linear-gradient(45deg, #8e9eab, #eef2f3);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textGlow 6s ease infinite alternate;
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+@keyframes textGlow {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+/* Buttons */
+button {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 1.3rem;
+  border-radius: 15px;
+  padding: 10px 20px;
+  outline: none;
+  background: linear-gradient(45deg,#a1c4fd,#c2e9fb);
+  background-size: 200% 200%;
+  animation: buttonGlow 8s ease infinite alternate;
+  color: #333;
+  cursor: pointer;
+  margin: 10px 6px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+@keyframes buttonGlow {
+  0% {background-position:0% 50%;}
+  50% {background-position:100% 50%;}
+  100% {background-position:0% 50%;}
+}
+
+/* Inputs & selects */
+input, select {
+  width: 70%;
+  margin: 12px auto;
+  display: block;
+  border: 2px solid;
+  border-image: linear-gradient(45deg, #a1c4fd,#c2e9fb) 1;
+  background: rgba(255,255,255,0.9);
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 12px;
+  padding: 10px;
+  outline: none;
+  text-align: center;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus {
+  box-shadow: 0 0 10px rgba(161,196,253,0.5);
+}
+
+/* Leaderboard */
+#leaderboard li {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 700;
+  font-size: 1.2rem;
+  background: linear-gradient(45deg, #8e9eab, #eef2f3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 4px 0;
+  animation: textGlow 6s ease infinite alternate;
+}
+
+/* Cards */
+.grid {
+  display: grid;
+  gap: 20px;
+  justify-content: center;
+  margin: 25px auto;
+}
+
+.card {
+  width: 130px;
+  height: 130px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.3s;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.68,-0.55,0.27,1.55), box-shadow 0.3s;
+  border-radius: 15px;
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  border-radius: 15px;
+  backface-visibility: hidden;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s, background 1s;
+}
+
+.card-front {
+  background: linear-gradient(45deg,#56bbfa,#fed8cd);
+}
+
+.card-front:hover {
+  transform: scale(1.07);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.card-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(45deg,#a1c4fd,#c2e9fb);
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card.matched .card-back {
+  animation: glowMatch 1s infinite alternate;
+}
+
+@keyframes glowMatch {
+  0% {box-shadow: 0 0 10px rgba(161,196,253,0.3);}
+  100% {box-shadow: 0 0 20px rgba(161,196,253,0.6);}
+}
+
+/* Sparkles and twinkles */
+.sparkle, .cursor-trail {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.8;
+  animation: sparkleFall 1s forwards;
+}
+
+@keyframes sparkleFall {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--x,0px), var(--y,50px)) scale(0.5); opacity:0; }
+}
+
+.cursor-trail {
+  width: 6px;
+  height: 6px;
+  animation: trailFade 0.8s forwards;
+}
+
+@keyframes trailFade {
+  0% {transform: scale(1); opacity:1;}
+  100% {transform: scale(0.2); opacity:0;}
+}
+
+.twinkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: twinkleAnim 2s infinite alternate ease-in-out;
+}
+
+@keyframes twinkleAnim {
+  0% {opacity: 0.2; transform: scale(1);}
+  50% {opacity: 0.7; transform: scale(1.2);}
+  100% {opacity: 0.2; transform: scale(1);}
+}
+
+/* Responsive */
+@media (max-width:600px){
+  .card { width: 100px; height: 100px; }
+  .card-front, .card-back { font-size: 2rem; }
+}
+@media (max-width:400px){
+  .card { width: 80px; height: 80px; }
+  .card-front, .card-back { font-size: 1.5rem; }
+}
+
+.page {opacity:1; transform: translateY(0); transition: opacity 0.6s ease, transform 0.6s ease;}
+.page.hidden {opacity:0; transform: translateY(20px); pointer-events:none;}
+#gamePage{display:block;}
+.theme-icon{cursor:pointer;font-size:2rem;position:absolute;top:15px;right:15px;}
+</style>
+</head>
+<body>
+
+<span class="theme-icon" id="themeIcon">🌞</span>
+
+<div class="container page" id="settingsPage">
+  <h1>🧠 Memory Game</h1>
+  <input type="text" id="playerName" placeholder="Enter your name"/>
+  <h3>Select Difficulty</h3>
+  <select id="difficulty">
+    <option value="easy">Easy</option>
+    <option value="medium">Medium</option>
+    <option value="hard">Hard</option>
+  </select>
+  <h3>Select Theme</h3>
+  <select id="emojiTheme">
+    <option value="animals">🐶 Animals</option>
+    <option value="food">🍔 Food</option>
+    <option value="sports">⚽ Sports</option>
+  </select>
+  <button id="startGame">Start Game</button>
+  <h3>Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+  <button id="clearLeaderboard">Clear Leaderboard</button>
+</div>
+
+<div class="container page hidden" id="gamePage">
+  <h2>Memory Game</h2>
+  <p><strong>Player:</strong> <span id="currentPlayer"></span></p>
+  <p><strong>Moves:</strong> <span id="moves">0</span></p>
+  <p><strong>Time:</strong> <span id="time">0</span>s</p>
+  <div class="grid" id="gameGrid"></div>
+  <button id="goBack">⬅ Go Back</button>
+</div>
+
+<script>
+// Emoji themes
+const themes = {
+  animals:["🐶","🐱","🦊","🐻","🐼","🐨","🦁","🐸"],
+  food:["🍔","🍕","🍟","🌭","🍣","🍦","🍩","🍫"],
+  sports:["⚽","🏀","🏈","🎾","🏓","🏸","🥊","🏐"]
+};
+
+let player="", difficulty="easy", theme="animals", moves=0, seconds=0, timer, firstCard=null, lockBoard=false, matchedPairs=0;
+
+const settingsPage = document.getElementById("settingsPage");
+const gamePage = document.getElementById("gamePage");
+const startBtn = document.getElementById("startGame");
+const goBackBtn = document.getElementById("goBack");
+const leaderboardEl = document.getElementById("leaderboard");
+const clearBtn = document.getElementById("clearLeaderboard");
+const grid = document.getElementById("gameGrid");
+const movesEl = document.getElementById("moves");
+const timeEl = document.getElementById("time");
+const playerEl = document.getElementById("currentPlayer");
+const themeIcon = document.getElementById("themeIcon");
+
+// Theme toggle
+themeIcon.addEventListener("click", () => {
+  document.body.classList.toggle("dark");
+  themeIcon.textContent = document.body.classList.contains("dark") ? "🌙" : "🌞";
+});
+
+// Page switching
+function switchPage(hideEl, showEl){
+  hideEl.classList.add("hidden");
+  setTimeout(()=> {
+    hideEl.style.display = "none";
+    showEl.style.display = "block";
+    showEl.classList.remove("hidden");
+  },600);
+}
+
+// Leaderboard
+function updateLeaderboard(){
+  const data = JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  leaderboardEl.innerHTML="";
+  data.forEach(entry => {
+    const li = document.createElement("li");
+    li.textContent = `${entry.name} - ${entry.moves} moves, ${entry.time}s`;
+    leaderboardEl.appendChild(li);
+  });
+}
+updateLeaderboard();
+
+clearBtn.addEventListener("click", () => {
+  localStorage.removeItem("leaderboard");
+  updateLeaderboard();
+});
+
+// Start game
+startBtn.addEventListener("click", () => {
+  player = document.getElementById("playerName").value || "Player";
+  difficulty = document.getElementById("difficulty").value;
+  theme = document.getElementById("emojiTheme").value;
+  moves = 0; seconds = 0; matchedPairs = 0;
+  movesEl.textContent = moves;
+  timeEl.textContent = seconds;
+  playerEl.textContent = player;
+  switchPage(settingsPage, gamePage);
+  startTimer();
+  setupBoard();
+});
+
+// Go back
+goBackBtn.addEventListener("click", () => {
+  stopTimer();
+  switchPage(gamePage, settingsPage);
+  updateLeaderboard();
+});
+
+// Timer
+function startTimer(){
+  timer = setInterval(()=> {
+    seconds++;
+    timeEl.textContent = seconds;
+  },1000);
+}
+function stopTimer(){
+  clearInterval(timer);
+}
+
+// Setup Board
+function setupBoard(){
+  grid.innerHTML="";
+  let pairs = difficulty==="easy"?4 : difficulty==="medium"?6 : 8;
+  let selected = themes[theme].slice(0,pairs);
+  let cards = [...selected, ...selected];
+  cards.sort(()=> Math.random()-0.5);
+  let columns = Math.ceil(Math.sqrt(cards.length));
+  grid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+  cards.forEach(symbol => {
+    const card = document.createElement("div");
+    card.classList.add("card");
+    const inner = document.createElement("div");
+    inner.classList.add("card-inner");
+    const front = document.createElement("div");
+    front.classList.add("card-front");
+    front.textContent="";
+    const back = document.createElement("div");
+    back.classList.add("card-back");
+    back.textContent = symbol;
+    inner.appendChild(front);
+    inner.appendChild(back);
+    card.appendChild(inner);
+    addTwinkle(card);
+    card.addEventListener("click", flipCard);
+    grid.appendChild(card);
+  });
+}
+
+// Add twinkle stars to each card
+function addTwinkle(card){
+  for(let i=0; i<5; i++){
+    const star = document.createElement("div");
+    star.classList.add("twinkle");
+    star.style.left = Math.random() * 80 + "%";
+    star.style.top = Math.random() * 80 + "%";
+    star.style.animationDuration = (1.5 + Math.random()*2) + "s";
+    card.appendChild(star);
+  }
+}
+
+// Flip card logic
+function flipCard(){
+  if(lockBoard || this.classList.contains("flipped")) return;
+  this.classList.add("flipped");
+  createCardSparkles(this);
+  if(!firstCard){
+    firstCard = this;
+  } else {
+    moves++;
+    movesEl.textContent = moves;
+    if(firstCard.querySelector(".card-back").textContent === this.querySelector(".card-back").textContent){
+      firstCard.classList.add("matched");
+      this.classList.add("matched");
+      firstCard = null;
+      matchedPairs++;
+      if(matchedPairs === grid.children.length/2){
+        stopTimer();
+        saveLeaderboard();
+        createConfetti();
+        setTimeout(()=> {
+          alert(`🎉 Congratulations ${player}! You completed the game in ${moves} moves and ${seconds} seconds.`);
+        }, 100);
+      }
+    } else {
+      lockBoard = true;
+      setTimeout(()=> {
+        firstCard.classList.remove("flipped");
+        this.classList.remove("flipped");
+        firstCard = null;
+        lockBoard = false;
+      }, 1000);
+    }
+  }
+}
+
+// Save to leaderboard
+function saveLeaderboard(){
+  const data = JSON.parse(localStorage.getItem("leaderboard")||"[]");
+  data.push({name:player, moves:moves, time:seconds});
+  data.sort((a,b)=> a.moves - b.moves || a.time - b.time);
+  if(data.length > 10) data.length = 10;
+  localStorage.setItem("leaderboard", JSON.stringify(data));
+  updateLeaderboard();
+}
+
+// Confetti celebration
+function createConfetti(){
+  const colors = ['#ff3cac','#784ba0','#ffb347','#ffcc33','#4facfe','#00f2fe','#43e97b','#38f9d7'];
+  for(let i=0;i<100;i++){
+    const conf=document.createElement('div');
+    conf.style.position='fixed';
+    conf.style.width='8px'; conf.style.height='8px';
+    conf.style.background=colors[Math.floor(Math.random()*colors.length)];
+    conf.style.top=Math.random()*window.innerHeight+'px';
+    conf.style.left=Math.random()*window.innerWidth+'px';
+    conf.style.opacity=Math.random();
+    conf.style.borderRadius='50%';
+    conf.style.pointerEvents='none';
+    conf.style.zIndex='9999';
+    document.body.appendChild(conf);
+    const fall=Math.random()*2+2; let y=0;
+    const interval=setInterval(()=> {
+      y+=fall;
+      conf.style.transform=`translateY(${y}px)`;
+      if(y>window.innerHeight){
+        conf.remove();
+        clearInterval(interval);
+      }
+    },16);
+  }
+}
+
+// Sparkles on card flip
+function createCardSparkles(card){
+  const colors = ['#ff3cac','#784ba0','#ffb347','#ffcc33','#4facfe','#00f2fe','#43e97b','#38f9d7'];
+  for(let i=0;i<12;i++){
+    const sparkle = document.createElement('div');
+    sparkle.classList.add('sparkle');
+    sparkle.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const angle = Math.random()*2*Math.PI;
+    const distance = Math.random()*50 + 20;
+    sparkle.style.setProperty('--x', `${Math.cos(angle)*distance}px`);
+    sparkle.style.setProperty('--y', `${Math.sin(angle)*distance}px`);
+    const rect = card.getBoundingClientRect();
+    sparkle.style.left = `${rect.left + rect.width/2}px`;
+    sparkle.style.top = `${rect.top + rect.height/2}px`;
+    document.body.appendChild(sparkle);
+    setTimeout(()=>{ sparkle.remove(); },1200);
+  }
+}
+
+// Cursor trailing sparkles
+document.addEventListener("mousemove", (e)=> {
+  const colors = ['#FF5EDF','#04C8DE','#FFA500','#FF69B4','#ADFF2F','#00FFFF','#FFD700'];
+  for(let i=0;i<3;i++){
+    const trail = document.createElement('div');
+    trail.classList.add('cursor-trail');
+    trail.style.background = colors[Math.floor(Math.random()*colors.length)];
+    trail.style.left = e.clientX + (Math.random()*10-5) + 'px';
+    trail.style.top = e.clientY + (Math.random()*10-5) + 'px';
+    document.body.appendChild(trail);
+    setTimeout(()=> { trail.remove(); },800);
+  }
+});
+</script>
+</body>
+</html>
